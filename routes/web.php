@@ -5,7 +5,7 @@ use App\Http\Controllers\BookController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookController;
 
-Route::get('/', [BookController::class, 'listBooks']); 
+Route::get('/','App\Http\Controllers\BookController@listBooks');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -45,4 +45,28 @@ Route::get('/testemail','App\Http\Controllers\MailController@testemail');
 
 require __DIR__.'/auth.php';
 
+Route::get('/book/list','App\Http\Controllers\BookController@booklist')
+->middleware('auth')->name("booklist");
+
+Route::get('/book/create','App\Http\Controllers\BookController@bookcreate')
+->middleware('auth')->name("bookcreate");
+Route::get('/book/edit/{id}','App\Http\Controllers\BookController@bookedit')
+->middleware('auth')->name("bookedit");
+Route::post('/book/save/{action}','App\Http\Controllers\BookController@booksave'
+)
+->middleware('auth')->name("booksave");
+Route::post('/book/delete','App\Http\Controllers\BookController@bookdelete')
+->middleware('auth')->name("bookdelete");
+
+Route::get('/sach','App\Http\Controllers\BookController@listBooks');
+
+Route::get('/sach/theloai/{id}','App\Http\Controllers\BookController@theloai');
+
+Route::get('sach/chitiet/{id}','App\Http\Controllers\BookController@chitiet');
+
+Route::get('/accountpanel','App\Http\Controllers\AccountController@accountpanel')
+->middleware('auth')->name("account");
+
+Route::post('/saveaccountinfo','App\Http\Controllers\AccountController@saveaccountinfo')
+->middleware('auth')->name('saveinfo');
 Route::post('/bookview', [BookController::class, 'bookview'])->name('bookview');
