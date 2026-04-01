@@ -32,3 +32,4 @@ class AccountController extends Controller
         return redirect()->route('account')->with('status', 'Cập nhật thành công');
     }   
 }
+

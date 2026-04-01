@@ -3,6 +3,7 @@
     <head>
         <title>{{$title}}</title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.slim.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -55,6 +56,22 @@
                             </ul>
                     </div>
                     <div class='col-3 p-0 d-flex justify-content-end'>
+                  
+                    <div class='col-3 p-0 d-flex justify-content-end'>
+                      <div style='color:white;position:relative' class='mr-2'>
+ <div style='width:20px; height:20px;background-color:#23b85c; font-size:12px; border:none;
+ border-radius:50%; position:absolute;right:2px;top:-2px' id='cart-number-product'>
+ @if (session('cart'))
+ {{ count(session('cart')) }}
+ @else
+ 0
+ @endif
+ </div>
+
+ <a href="{{route('order')}}" style='cursor:pointer;color:white;'>
+ <i class="fa fa-cart-arrow-down fa-2x mr-2 mt-2" aria-hidden="true"></i>
+ </a>
+</div>
                         @auth
                             <div class="dropdown">
                                 <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
