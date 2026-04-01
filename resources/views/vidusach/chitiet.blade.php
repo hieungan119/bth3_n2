@@ -13,7 +13,7 @@
 <h4>{{$data->tieu_de}}</h4>
 <div class='info'> 
   <div>
-    <img src="{{asset('images/'.$data->file_anh_bia)}}" width="200px" height="200px">
+    <img src="{{asset('book_image/'.$data->file_anh_bia)}}" width="200px" height="200px">
   </div>
   <div>
     Nhà cung cấp: <b>{{$data->nha_cung_cap}}</b><br>
