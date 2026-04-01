@@ -1,15 +1,19 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\BookController; 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [BookController::class, 'listBooks']); 
 
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/sach','App\Http\Controllers\BookController@listBooks');
+
+Route::get('/sach/theloai/{id}','App\Http\Controllers\BookController@theloai');
+
+Route::get('sach/chitiet/{id}','App\Http\Controllers\BookController@chitiet');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -18,3 +22,5 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+Route::post('/bookview', [BookController::class, 'bookview'])->name('bookview');
