@@ -32,7 +32,6 @@
                 margin:10px;
                 text-align:center;
             }
-
         </style>
     </head>
     <body>
@@ -56,6 +55,7 @@
                                 </li>
                             </ul>
                     </div>
+                    <div class='col-3 p-0 d-flex justify-content-end'>
                   
                     <div class='col-3 p-0 d-flex justify-content-end'>
                       <div style='color:white;position:relative' class='mr-2'>
