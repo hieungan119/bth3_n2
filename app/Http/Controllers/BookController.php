@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth; 
+use App\Models\User;
+use App\Notifications\TestSendEmail;
 
 class BookController extends Controller
 {
@@ -96,59 +98,62 @@ class BookController extends Controller
     }
 
     // 7. Xử lý đặt hàng (Lưu vào database)
-    public function ordercreate(Request $request)
-    {
-        $request->validate([
-            "hinh_thuc_thanh_toan" => ["required", "numeric"]
-        ]);
+public function ordercreate(Request $request)
+{
+    $request->validate([
+        "hinh_thuc_thanh_toan" => ["required", "numeric"]
+    ]);
 
-        $data = [];
-        $quantity = [];
+    $data = [];
+    $quantity = [];
+    $id_don_hang = null;
 
-        // Kiểm tra giỏ hàng có dữ liệu mới xử lý
-        if (session()->has('cart') && !empty(session('cart'))) {
-            
-            $order = [
-                "ngay_dat_hang" => now(),
-                "tinh_trang" => 1,
-                "hinh_thuc_thanh_toan" => $request->hinh_thuc_thanh_toan,
-                "user_id" => Auth::user()->id 
-            ];
+    if (session()->has('cart') && !empty(session('cart'))) {
 
-            DB::transaction(function () use ($order, &$data, &$quantity) {
-                // Lưu bảng don_hang và lấy ID vừa tạo
-                $id_don_hang = DB::table("don_hang")->insertGetId($order);
-                
-                $cart = session("cart");
-                $ids = array_keys($cart);
-                $quantity = $cart;
+        $order = [
+            "ngay_dat_hang" => now(),
+            "tinh_trang" => 1,
+            "hinh_thuc_thanh_toan" => $request->hinh_thuc_thanh_toan,
+            "user_id" => Auth::user()->id
+        ];
 
-                // Lấy thông tin sách để tính giá
-                $data = DB::table("sach")->whereIn("id", $ids)->get();
+        DB::transaction(function () use ($order, &$data, &$quantity, &$id_don_hang) {
+            $id_don_hang = DB::table("don_hang")->insertGetId($order);
 
-                $detail = [];
-                foreach ($data as $row) {
-                    $detail[] = [
-                        "ma_don_hang" => $id_don_hang,
-                        "sach_id" => $row->id,
-                        "so_luong" => $quantity[$row->id],
-                        "don_gia" => $row->gia_ban
-                    ];
-                }
+            $cart = session("cart");
+            $ids = array_keys($cart);
+            $quantity = $cart;
 
-                // Lưu vào bảng chi tiết đơn hàng
-                DB::table("chi_tiet_don_hang")->insert($detail);
+            $data = DB::table("sach")->whereIn("id", $ids)->get();
 
-                // Xóa giỏ hàng sau khi đặt thành công
-                session()->forget('cart');
-            });
+            $detail = [];
+            foreach ($data as $row) {
+                $detail[] = [
+                    "ma_don_hang" => $id_don_hang,
+                    "sach_id" => $row->id,
+                    "so_luong" => $quantity[$row->id],
+                    "don_gia" => $row->gia_ban
+                ];
+            }
 
-        } else {
-            // Nếu giỏ hàng rỗng quay về trang chủ
-            return redirect()->route('listBooks')->with('error', 'Giỏ hàng của bạn đang trống!');
-        }
+            DB::table("chi_tiet_don_hang")->insert($detail);
+        });
 
-        // Trả về view order để hiển thị thông báo thành công hoặc danh sách đơn
-        return view("vidusach.order", compact('data', 'quantity'));
+        // Lấy lại dữ liệu chi tiết đơn hàng để gửi email
+        $donHang = DB::table("chi_tiet_don_hang as c")
+            ->join("sach as s", "c.sach_id", "=", "s.id")
+            ->select("s.tieu_de", "c.so_luong", "c.don_gia")
+            ->where("c.ma_don_hang", $id_don_hang)
+            ->get();
+
+        $user = User::find(Auth::user()->id);
+        $user->notify(new TestSendEmail($donHang));
+
+        session()->forget('cart');
+
+        return redirect()->route('order')->with('success', 'Đặt hàng thành công, email đã được gửi!');
     }
+
+    return redirect()->route('listBooks')->with('error', 'Giỏ hàng của bạn đang trống!');
+}
 }
