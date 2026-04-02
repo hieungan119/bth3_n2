@@ -36,7 +36,7 @@
     </head>
     <body>
         <header style='text-align:center'>
-            <img src="{{asset('images/banner_sach.jpg')}}" width="1000px">
+            <img src="{{asset('storage/book_image/banner_sach.jpg')}}" width="1000px">
             <nav class="navbar navbar-light navbar-expand-sm">
                 <div class='container-fluid p-0'>
                     <div class='col-9 p-0'>

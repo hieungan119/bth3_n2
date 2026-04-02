@@ -3,54 +3,35 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class TestSendEmail extends Notification implements ShouldQueue
+class TestSendEmail extends Notification
 {
     use Queueable;
 
-    public $token;
+    private $data;
 
-    /**
-     * Create a new notification instance.
-     */
-    public function __construct($token)
+    public function __construct($data)
     {
-        $this->token = $token;
+        $this->data = $data;
     }
 
-    /**
-     * Get the notification's delivery channels.
-     */
     public function via(object $notifiable): array
     {
         return ['mail'];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     */
-    public function toMail(object $notifiable): MailMessage
+    public function toMail($notifiable)
     {
-        $url = url(route('password.reset', [
-            'token' => $this->token,
-            'email' => $notifiable->getEmailForPasswordReset(),
-        ], false));
-
         return (new MailMessage)
-            ->subject('Thông báo đặt lại mật khẩu - ' . config('app.name'))
-            ->greeting('Chào bạn ' . $notifiable->name . '!')
-            ->line('Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn.')
-            ->action('Đặt lại mật khẩu', $url)
-            ->line('Nếu bạn không yêu cầu, vui lòng bỏ qua email này.')
-            ->salutation('Trân trọng, Đội ngũ hỗ trợ.');
+            ->subject('Đặt hàng thành công')
+            ->view('email_template.don_hang_thanh_cong', [
+                'data' => $this->data
+            ]);
     }
+    
 
-    /**
-     * Get the array representation of the notification.
-     */
     public function toArray(object $notifiable): array
     {
         return [];
